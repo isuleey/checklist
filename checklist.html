@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>番茄能量站 · 战士进化打卡表</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #0f1c33 0%, #16294a 40%, #eaf2fc 40.1%, #f6f9fd 100%);
+    padding: 8px; color: #2b3a4a;
+    -webkit-text-size-adjust: 100%;
+  }
+  .sheet { background: #fff; border-radius: 16px; padding: 12px; max-width: 100%; overflow: hidden; box-shadow: 0 8px 30px rgba(10,25,60,0.35); }
+
+  /* ===== 顶部 ===== */
+  .header {
+    background: linear-gradient(135deg, #0d2b52 0%, #1d4e89 50%, #38b6ff 100%);
+    color: #fff; padding: 12px 16px; border-radius: 12px; margin-bottom: 10px;
+    position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; right: -40px; top: -40px; width: 170px; height: 170px;
+    background: radial-gradient(circle, rgba(255,220,120,0.28) 0%, rgba(255,220,120,0) 65%);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: ''; position: absolute; left: 30%; top: -60px; width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%; animation: floatGlow 5s ease-in-out infinite;
+  }
+  @keyframes floatGlow { 0%,100% { transform: translateY(0); opacity: 0.7; } 50% { transform: translateY(18px); opacity: 1; } }
+  .header h1 { font-size: 19px; font-weight: 800; letter-spacing: 1px; position: relative; z-index: 1; }
+  .header .sub { font-size: 11px; opacity: 0.9; margin-top: 2px; letter-spacing: 2px; position: relative; z-index: 1; }
+  .header .info { display: flex; gap: 10px; font-size: 12px; flex-wrap: wrap; align-items: center; margin-top: 8px; position: relative; z-index: 1; }
+  .header .info span { background: rgba(255,255,255,0.18); padding: 3px 10px; border-radius: 12px; }
+  .header .info input {
+    width: 48px; padding: 3px 4px; border-radius: 6px; border: none; font-size: 12px; text-align: center;
+  }
+
+  /* ===== 能量面板 ===== */
+  .power-panel {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    background: linear-gradient(135deg, #1a2c4c 0%, #24406e 100%);
+    border: 2px solid #3a5a92; border-radius: 16px; padding: 12px 16px; margin-bottom: 10px;
+    box-shadow: inset 0 0 30px rgba(56,182,255,0.08);
+  }
+  .lv-badge {
+    width: 84px; height: 84px; border-radius: 50%; flex-shrink: 0; position: relative;
+    background: radial-gradient(circle at 32% 28%, #ffd36e, #ff8c1a 60%, #e06800);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; box-shadow: 0 0 20px rgba(255,140,26,0.7);
+    animation: breathe 2.2s ease-in-out infinite;
+  }
+  .lv-badge::after {
+    content: ''; position: absolute; inset: -8px; border-radius: 50%;
+    border: 3px solid rgba(255,180,77,0.5); animation: ringPulse 2.2s ease-out infinite;
+  }
+  @keyframes breathe { 0%,100% { box-shadow: 0 0 14px rgba(255,140,26,0.5); } 50% { box-shadow: 0 0 34px rgba(255,140,26,0.95); } }
+  @keyframes ringPulse { 0% { transform: scale(0.92); opacity: 1; } 80% { transform: scale(1.25); opacity: 0; } 100% { transform: scale(1.25); opacity: 0; } }
+  .lv-badge .lv { font-size: 20px; font-weight: 900; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.35); }
+  .lv-badge .lv-t { font-size: 8.5px; margin-top: 3px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .lv-mid { flex: 1; min-width: 200px; }
+  .lv-title { font-size: 16px; font-weight: 800; color: #ffd36e; margin-bottom: 6px; letter-spacing: 1px; }
+  .lv-title .star { color: #fff; font-size: 11px; font-weight: 600; }
+  .xp-bar-wrap { height: 18px; background: #0e1c36; border-radius: 10px; overflow: hidden; border: 1px solid #3a5a92; }
+  .xp-bar {
+    height: 100%; width: 0%; border-radius: 10px; position: relative; overflow: hidden;
+    background: linear-gradient(90deg, #ffb347, #ff8c1a, #ffd36e, #ff8c1a, #ffb347);
+    background-size: 300% 100%; animation: flowBar 2.5s linear infinite;
+    transition: width 0.8s ease;
+  }
+  @keyframes flowBar { 0% { background-position: 0% 0; } 100% { background-position: 300% 0; } }
+  .xp-text { font-size: 10px; color: #9db8e0; margin-top: 4px; }
+  .lv-right { text-align: center; flex-shrink: 0; }
+  .streak-box {
+    background: #fff2d8; border: 2px solid #ffb84d; border-radius: 12px; padding: 6px 12px;
+    font-size: 13px; font-weight: 800; color: #e07b1f;
+  }
+  .streak-box .fire { display: inline-block; animation: flame 0.9s ease-in-out infinite; }
+  @keyframes flame { 0%,100% { transform: scale(1) rotate(-4deg); } 50% { transform: scale(1.35) rotate(4deg); } }
+  .tomato-box {
+    background: #eef6fd; border: 2px solid #9cc8f0; border-radius: 12px; padding: 6px 12px;
+    font-size: 13px; font-weight: 800; color: #e0402a; margin-top: 4px;
+  }
+  .tomato-box .to { display: inline-block; animation: hop 1.6s ease-in-out infinite; }
+  @keyframes hop { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  .motto { width: 100%; font-size: 12px; color: #ffd36e; font-weight: 600; text-align: center; margin-top: 2px; }
+
+  /* ===== 规则条 ===== */
+  .rules { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .rule-item {
+    flex: 1 1 160px; background: #f6faff; border: 1px solid #d8e6f7; border-radius: 10px;
+    padding: 6px 8px; font-size: 10px; color: #5a6b7d; line-height: 1.5;
+  }
+  .rule-item b { color: #e07b1f; font-size: 11px; }
+
+  /* ===== 核心：左右分栏布局（Safari兼容） ===== */
+  .table-wrap { display: flex; align-items: flex-start; border: 1px solid #dbe4ee; border-radius: 12px; overflow: hidden; }
+  .left-panel { width: 292px; min-width: 292px; flex-shrink: 0; background: #fbfcfe; border-right: 2px solid #d3dde9; }
+  .right-panel { flex: 1; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #fff; }
+  .right-inner { min-width: 1330px; }
+
+  .row { display: flex; height: 38px; border-bottom: 1px solid #eef2f7; }
+  .row.head-row { height: 50px; background: #eef4fb; font-weight: 700; font-size: 11px; color: #4a5a6c; }
+  .row:last-child { border-bottom: none; }
+
+  .l-cell {
+    display: flex; align-items: center; justify-content: center;
+    border-right: 1px solid #eef2f7; font-size: 11px; padding: 2px 4px; text-align: center;
+  }
+  .l-cat { width: 50px; min-width: 50px; }
+  .l-sub { width: 40px; min-width: 40px; font-weight: 700; font-size: 12px; }
+  .l-name { width: 112px; min-width: 112px; text-align: left !important; justify-content: flex-start !important; font-size: 11px; }
+  .l-freq { width: 50px; min-width: 50px; font-size: 10px; color: #7a8896; }
+  .l-point { width: 40px; min-width: 40px; font-weight: 700; color: #e07b1f; font-size: 13px; }
+
+  .cat-badge { display: inline-block; padding: 2px 5px; border-radius: 4px; color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+  .cat-home-bg { background: #2f7fd6; }
+  .cat-school-bg { background: #f2994a; }
+  .cat-daily-bg { background: #2ecc71; }
+
+  .sub-en { color: #2980b9; background: #eef6fd; }
+  .sub-math { color: #e74c3c; background: #fdf0ef; }
+  .sub-cn { color: #d4880f; background: #fef9ef; }
+
+  .r-cell {
+    width: 42px; min-width: 42px; display: flex; align-items: center; justify-content: center;
+    border-right: 1px solid #e8edf3; font-size: 10px; position: relative;
+  }
+  .r-cell:nth-child(5n) { border-right: 2px solid #b9c9dc; }
+  .r-cell.head-day { font-size: 10px; flex-direction: column; line-height: 1.2; }
+  .r-cell.head-day .d-num { font-size: 13px; font-weight: 700; }
+  .r-cell.head-day .d-wk { font-size: 9px; color: #98a6b5; }
+  .r-cell.head-day.sun { background: #fdecec; }
+  .r-cell.head-day.sun .d-wk { color: #e74c3c; }
+  .r-cell.total-col { width: 50px; min-width: 50px; background: #fbf4f4; font-size: 10px; flex-direction: column; line-height: 1.3; }
+
+  .check-cell { cursor: pointer; user-select: none; background: #fff; height: 44px; padding: 0 3px; transition: background 0.15s; }
+  .check-cell:active { background: #fff8e1; }
+  .check-cell .ck { color: #2ecc71; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .check-cell .tm { margin-left: auto; font-size: 9px; color: #e0402a; font-weight: 700; flex-shrink: 0; line-height: 1; }
+  .check-cell.s1 { background: #e8f5e9; }
+  .check-cell.s2 { background: #fff3e0; }
+  .check-cell.s3 { background: #ffe6c2; }
+  .check-cell.s4 { background: #ffd39b; }
+  .check-cell.s4 .ck { color: #bf360c; }
+  .check-cell.off { background: #f2f3f5; cursor: default; }
+
+  .col-hl { background: #eaf3ff !important; }
+  .head-day.col-hl-th { background: #d6e8fb !important; }
+
+  .check-cell.today { box-shadow: inset 0 0 0 2px #ffb84d; }
+  .head-day.today-th { background: #ffb84d !important; }
+  .head-day.today-th .d-num { color: #fff; }
+  .head-day.today-th .d-wk { color: #ffe9c9; }
+  .today-tag {
+    position: absolute; top: -5px; right: -5px; background: #e74c3c; color: #fff;
+    font-size: 9px; padding: 1px 4px; border-radius: 7px; font-weight: 700; z-index: 2;
+  }
+
+  .cell-tip {
+    position: fixed; transform: translateX(-50%); background: #fff; color: #2b3a4a;
+    border: 2px solid #ffb84d; border-radius: 9px; padding: 5px 11px; font-size: 12px;
+    font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 110;
+    white-space: nowrap; pointer-events: none; animation: tipIn 0.25s ease;
+  }
+  @keyframes tipIn { 0% { opacity: 0; transform: translateX(-50%) translateY(4px); } 100% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+  .row.cat-start { border-top: 3px solid #b9c9dc; }
+
+  .check-cell.pop { animation: pop 0.32s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.3); } 70% { transform: scale(0.94); } 100% { transform: scale(1); } }
+
+  .float-score {
+    position: absolute; top: -2px; right: 0; font-size: 11px; font-weight: 800;
+    color: #ff8c1a; pointer-events: none; z-index: 6;
+    animation: floatUp 0.95s ease forwards; text-shadow: 0 1px 2px rgba(255,255,255,0.95);
+  }
+  @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-24px); } }
+  .float-tomato {
+    position: absolute; top: -6px; right: -4px; font-size: 15px; pointer-events: none; z-index: 7;
+    animation: toFly 1s ease-out forwards;
+  }
+  @keyframes toFly { 0% { opacity: 1; transform: translateY(0) scale(0.6); } 30% { transform: translateY(-10px) scale(1.25); } 100% { opacity: 0; transform: translateY(-30px) scale(1); } }
+
+  .total-cell .sc { font-weight: 700; color: #e74c3c; font-size: 12px; }
+  .total-cell .tm { color: #e0402a; font-size: 10px; }
+  .scroll-hint { text-align: center; font-size: 10px; color: #aab6c4; margin-top: 6px; }
+
+  .particle {
+    position: fixed; width: 9px; height: 9px; border-radius: 50%; pointer-events: none; z-index: 100;
+    animation: fly 0.95s ease-out forwards;
+  }
+  @keyframes fly {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0.1); opacity: 0; }
+  }
+  .spark {
+    position: fixed; width: 60px; height: 60px; pointer-events: none; z-index: 101;
+    background: radial-gradient(circle, rgba(255,220,120,0.9) 0%, rgba(255,140,26,0.35) 45%, rgba(255,140,26,0) 70%);
+    border-radius: 50%; animation: sparkOut 0.7s ease-out forwards;
+  }
+  @keyframes sparkOut { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(3.4); opacity: 0; } }
+
+  .badges-title { font-size: 14px; font-weight: 800; color: #2b3a4a; margin: 12px 0 6px; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    flex: 1 1 90px; max-width: 130px; border: 2px solid #e2e8f0; border-radius: 12px;
+    padding: 8px 6px; text-align: center; background: #f8fafc; position: relative;
+  }
+  .badge .ic { font-size: 26px; display: block; }
+  .badge .nm { font-size: 11px; font-weight: 800; color: #5a6b7d; margin-top: 2px; display: block; }
+  .badge .ds { font-size: 9px; color: #9aa7b5; display: block; margin-top: 1px; }
+  .badge.got {
+    border-color: #ffb84d; background: linear-gradient(180deg, #fff8ea, #fff3d9);
+    box-shadow: 0 2px 8px rgba(255,180,77,0.35); animation: badgeGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes badgeGlow { 0%,100% { box-shadow: 0 2px 8px rgba(255,180,77,0.35); } 50% { box-shadow: 0 2px 18px rgba(255,180,77,0.75); } }
+  .badge.got .nm { color: #d2691e; }
+  .badge.locked { filter: grayscale(0.9); opacity: 0.55; }
+
+  .money-box {
+    margin-top: 12px; border: 2px solid #f0c36d; border-radius: 12px;
+    background: linear-gradient(180deg, #fffdf3, #fff8e6); padding: 10px 12px;
+  }
+  .money-title { font-size: 14px; font-weight: 800; color: #b8860b; margin-bottom: 8px; }
+  .money-tip { font-size: 10px; color: #b09a62; margin-bottom: 6px; }
+  .money-head, .money-row { display: flex; align-items: center; gap: 6px; }
+  .money-head {
+    font-size: 10px; color: #8a7a4d; font-weight: 700; padding: 0 4px 4px;
+    border-bottom: 1px dashed #e8d9a8; margin-bottom: 4px;
+  }
+  .money-row {
+    background: #fff; border: 1px solid #f3e3b8; border-radius: 8px;
+    padding: 4px 8px; margin-bottom: 5px; font-size: 12px;
+  }
+  .money-row .mn { flex: 1; font-weight: 700; color: #5a4a1f; }
+  .money-row .up { width: 56px; font-size: 10px; color: #a08a4f; text-align: center; }
+  .money-row .btn-m {
+    width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer;
+    font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0; line-height: 1;
+  }
+  .btn-m.minus { background: #e74c3c; }
+  .btn-m.plus { background: #27ae60; }
+  .money-row .cnt { width: 30px; text-align: center; font-size: 15px; font-weight: 800; color: #333; }
+  .money-row .sub { width: 62px; text-align: right; font-weight: 800; color: #27ae60; }
+  .money-row .sub.neg { color: #e74c3c; }
+  .money-total {
+    margin-top: 8px; text-align: right; font-size: 15px; font-weight: 800; color: #b8860b;
+    background: #fff6df; border: 1px solid #f0c36d; border-radius: 8px; padding: 7px 12px;
+  }
+  .money-total span { font-size: 20px; color: #d48900; }
+
+  .footer { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .stat { flex: 1 1 80px; border: 2px solid #e0e8f0; border-radius: 10px; padding: 6px 8px; text-align: center; background: #fbfdff; }
+  .stat .lb { font-size: 10px; color: #8a97a6; margin-bottom: 2px; }
+  .stat .vl { font-size: 20px; font-weight: 800; }
+  .stat .sb { font-size: 9px; color: #aab6c4; }
+  .stat.sc .vl { color: #e07b1f; }
+  .stat.tm .vl { color: #e0402a; }
+  .stat.rt .vl { color: #3498db; }
+  .stat.fd .vl { color: #2ecc71; }
+  .reward {
+    flex: 2 1 200px; border: 2px dashed #f39c12; border-radius: 10px; padding: 8px 12px; background: #fffbf0;
+  }
+  .reward .tt { font-size: 12px; font-weight: 800; color: #f39c12; margin-bottom: 5px; }
+  .reward .items { display: flex; gap: 14px; font-size: 11px; color: #66737f; flex-wrap: wrap; }
+  .reward .items div { display: flex; align-items: center; gap: 3px; }
+  .reward .star { color: #f39c12; font-size: 13px; }
+  .sign { display: flex; gap: 24px; margin-top: 8px; font-size: 11px; color: #99a6b4; justify-content: flex-end; flex-wrap: wrap; }
+
+  .levelup-overlay {
+    position: fixed; inset: 0; background: rgba(8,16,32,0.72); z-index: 99;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .levelup-box {
+    background: linear-gradient(180deg, #fffdf5, #fff3d6); border-radius: 22px; padding: 26px 38px;
+    text-align: center; border: 4px solid #ffb84d; position: relative;
+    box-shadow: 0 0 60px rgba(255,180,77,0.8);
+    animation: rise 0.5s cubic-bezier(0.18,1.25,0.4,1);
+  }
+  .levelup-box::before {
+    content: ''; position: absolute; inset: -16px; border-radius: 28px;
+    border: 3px solid rgba(255,200,100,0.55); animation: boxRing 1.2s ease-out infinite;
+  }
+  @keyframes boxRing { 0% { transform: scale(0.94); opacity: 1; } 100% { transform: scale(1.12); opacity: 0; } }
+  @keyframes rise { 0% { transform: scale(0.4) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+  .levelup-box .big { font-size: 52px; animation: bigPop 0.7s ease; display: inline-block; }
+  @keyframes bigPop { 0% { transform: scale(0) rotate(-30deg); } 60% { transform: scale(1.4) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+  .levelup-box .t1 { font-size: 20px; font-weight: 900; color: #d2691e; margin-top: 4px; }
+  .levelup-box .t2 { font-size: 13px; color: #66737f; margin-top: 4px; }
+  .levelup-box .btn {
+    display: inline-block; margin-top: 14px; background: linear-gradient(90deg, #ff8c1a, #ffb347);
+    color: #fff; border: none; border-radius: 22px; padding: 8px 26px; font-size: 15px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255,140,26,0.5);
+  }
+
+  .toast {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    background: #fff; border: 2px solid #ff8c1a; border-radius: 22px;
+    padding: 8px 18px; font-size: 14px; font-weight: 800; color: #d2691e;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18); z-index: 98; white-space: nowrap;
+    animation: toastIn 0.3s ease;
+  }
+  @keyframes toastIn { 0% { opacity: 0; transform: translateX(-50%) translateY(-16px); } 100% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+  /* ===== 数据备份区 ===== */
+  .backup-box {
+    margin-top: 12px; border: 2px solid #5d9cec; border-radius: 12px;
+    background: linear-gradient(180deg, #f2f8ff, #eaf3fd); padding: 10px 12px;
+  }
+  .backup-title { font-size: 14px; font-weight: 800; color: #2f7fd6; margin-bottom: 4px; }
+  .backup-tip { font-size: 10px; color: #6a86a8; margin-bottom: 8px; line-height: 1.5; }
+  .backup-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-b {
+    border: none; border-radius: 10px; padding: 9px 16px; font-size: 13px; font-weight: 800;
+    color: #fff; cursor: pointer; flex: 1 1 140px;
+  }
+  .btn-b.up { background: linear-gradient(90deg, #2f7fd6, #5d9cec); }
+  .btn-b.down { background: linear-gradient(90deg, #27ae60, #52c789); }
+
+  @media print {
+    body { padding: 0; background: #fff; }
+    .sheet { padding: 0; border-radius: 0; box-shadow: none; }
+    .right-panel { overflow: visible; }
+    .right-inner { min-width: 0; }
+    .check-cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .power-panel, .rules, .badges-title, .badges, .scroll-hint, .toast, .levelup-overlay, .particle, .spark, .backup-box { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="header">
+    <h1>🍅 番茄能量站</h1>
+    <div class="sub">战士进化 · 五年级每日专注打卡</div>
+    <div class="info">
+      <span>小勇士：<input type="text" id="nameInput" style="width:72px;" placeholder="写名字"></span>
+      <span>
+        <input type="number" id="yearInput" value="2026" min="2020" max="2035">年
+        <input type="number" id="monthInput" value="9" min="1" max="12">月
+      </span>
+      <span>目标积分 ≥ <input type="number" id="goalInput" style="width:44px;" placeholder="60"> 分</span>
+    </div>
+  </div>
+
+  <div class="power-panel">
+    <div class="lv-badge">
+      <div class="lv" id="lvNum">Lv.1</div>
+      <div class="lv-t" id="lvName">能量豆丁</div>
+    </div>
+    <div class="lv-mid">
+      <div class="lv-title" id="lvTitle">能量豆丁 <span class="star">· 进化中</span></div>
+      <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar"></div></div>
+      <div class="xp-text" id="xpText">再攒 10 个🍅 进化为「光之新星」</div>
+    </div>
+    <div class="lv-right">
+      <div class="streak-box"><span class="fire">🔥</span> 连胜 <span id="streakNum">0</span> 天</div>
+      <div class="tomato-box"><span class="to">🍅</span> 本月 <span id="tomatoNum">0</span> 个</div>
+    </div>
+    <div class="motto" id="motto">今天的专注，明天的超能力！</div>
+  </div>
+
+  <div class="rules">
+    <div class="rule-item">✅ <b>完成打勾</b><br>家庭作业2分 / 学校1分 / 打卡1分</div>
+    <div class="rule-item">🍅 <b>番茄能量</b><br>用番茄钟专注25分钟做完，再点一下得1个🍅</div>
+    <div class="rule-item">⚡ <b>战士进化</b><br>攒🍅进化：10→光之新星 25→旋风小侠 50→烈焰勇士…</div>
+    <div class="rule-item">🔥 <b>连胜大奖</b><br>连续全勤7/14/21天 +5/+10/+15分；集徽章也有分</div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="left-panel">
+      <div class="row head-row">
+        <div class="l-cell l-cat">大类</div>
+        <div class="l-cell l-sub">学科</div>
+        <div class="l-cell l-name">打卡内容</div>
+        <div class="l-cell l-freq">频次</div>
+        <div class="l-cell l-point">分</div>
+      </div>
+      <div id="leftRows"></div>
+    </div>
+    <div class="right-panel">
+      <div class="right-inner">
+        <div class="row head-row" id="rightHead"></div>
+        <div id="rightRows"></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">← 左右滑动右侧日期区，左侧固定不动 →</div>
+
+  <div class="badges-title">🏅 成就徽章墙</div>
+  <div class="badges" id="badgesBox"></div>
+
+  <div class="money-box">
+    <div class="money-title">💰 平时奖励记录（现金奖励，点 + / − 记录次数，自动算钱）</div>
+    <div class="money-tip">英语听写全对+5 / 优秀照片+5 / 单元测试95以上+50、100分+60 / 期中95以上+60、100分+100 / 期末甲+50 / 语数英家庭作业评分A- 扣5</div>
+    <div class="money-head">
+      <div style="flex:1;">奖励规则</div>
+      <div style="width:56px;text-align:center;">单价</div>
+      <div style="width:26px;"></div>
+      <div style="width:30px;text-align:center;">次数</div>
+      <div style="width:26px;"></div>
+      <div style="width:62px;text-align:right;">小计</div>
+    </div>
+    <div id="moneyRows"></div>
+    <div class="money-total">本月奖励合计：<span id="moneyTotal">0</span> 元</div>
+  </div>
+
+  <div class="footer">
+    <div class="stat sc">
+      <div class="lb">本月总积分</div>
+      <div class="vl" id="totalScore">0</div>
+      <div class="sb" id="scoreBreak">基础0+奖励0</div>
+    </div>
+    <div class="stat tm">
+      <div class="lb">本月总番茄</div>
+      <div class="vl" id="totalTomato">0</div>
+      <div class="sb">个专注🍅</div>
+    </div>
+    <div class="stat rt">
+      <div class="lb">完成率</div>
+      <div class="vl" id="totalRate">0%</div>
+      <div class="sb">按✓统计</div>
+    </div>
+    <div class="stat fd">
+      <div class="lb">全勤天数</div>
+      <div class="vl" id="fullDays">0</div>
+      <div class="sb">天</div>
+    </div>
+    <div class="reward">
+      <div class="tt">🎁 积分兑换奖励（和爸爸妈妈商量好填进来）</div>
+      <div class="items">
+        <div><span class="star">★</span>100分：__________</div>
+        <div><span class="star">★</span>200分：__________</div>
+        <div><span class="star">★</span>300分：__________</div>
+        <div><span class="star">★</span>400分：__________</div>
+        <div><span class="star">★</span>全勤：__________</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据备份区：链接会过期，数据永远掌握在自己手里 -->
+  <div class="backup-box">
+    <div class="backup-title">💾 数据备份中心（强烈建议每周备份一次）</div>
+    <div class="backup-tip">⚠️ 网页链接可能过期，但打卡数据存在本机浏览器里。<b>换链接/换设备前先点「复制备份」</b>，粘贴到微信发给自己或备忘录存一份。<b>万一数据不见了</b>，点「粘贴恢复」即可找回。</div>
+    <div class="backup-btns">
+      <button class="btn-b up" id="btnBackup">📤 复制备份数据</button>
+      <button class="btn-b down" id="btnRestore">📥 粘贴恢复数据</button>
+    </div>
+  </div>
+
+  <div class="sign">
+    <span>孩子签字：__________</span>
+    <span>家长签字：__________</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var KEY = 'grade5_checklist_v16';
+  var WK = ['日','一','二','三','四','五','六'];
+  var MOTTOS = [
+    '今天的专注，明天的超能力！',
+    '每个番茄，都是你专注的勋章！',
+    '番茄钟一响，小宇宙爆发！',
+    '又攒了一个🍅，离进化更近了！',
+    '别停，下一个战士称号在等你！',
+    '专注25分钟，变强一大截！',
+    '你专注的样子，比光之英雄还帅！',
+    '小小番茄，大大能量！',
+    '连胜继续，火焰不灭！',
+    '进化之路，由你点亮！'
+  ];
+  var LEVELS = [
+    {need:0,   name:'能量豆丁'},
+    {need:10,  name:'光之新星'},
+    {need:25,  name:'旋风小侠'},
+    {need:50,  name:'烈焰勇士'},
+    {need:80,  name:'雷光骑士'},
+    {need:120, name:'星辉战神'},
+    {need:170, name:'光之英雄'},
+    {need:230, name:'宇宙守护者'},
+    {need:300, name:'传说·星域之主'},
+    {need:400, name:'终极·全能战神'}
+  ];
+
+  var MONEY_RULES = [
+    {name:'英语报听写全对', unit:'5元/次', price:5},
+    {name:'优秀照片', unit:'5元/张', price:5},
+    {name:'单元测试95分以上', unit:'50元/次', price:50},
+    {name:'单元测试100分', unit:'60元/次', price:60},
+    {name:'期中考试95分', unit:'60元/次', price:60},
+    {name:'期中考试100分', unit:'100元/次', price:100},
+    {name:'期末考试甲等', unit:'50元/次', price:50},
+    {name:'家庭作业评分A-（扣）', unit:'-5元/次', price:-5}
+  ];
+
+  var tasks = [
+    {cat:'home', sub:'数学', name:'五星学霸1面', freq:'每天1次', point:2, sunOnly:false},
+    {cat:'home', sub:'英语', name:'新东方作业', freq:'每周日', point:2, sunOnly:true},
+    {cat:'home', sub:'数学', name:'53天天练1面', freq:'每天', point:2, sunOnly:false},
+    {cat:'home', sub:'语文', name:'阅读理解视频+练习', freq:'每天', point:2, sunOnly:false},
+    {cat:'home', sub:'语文', name:'试卷1篇', freq:'每周', point:2, sunOnly:false},
+    {cat:'home', sub:'数学', name:'试卷1篇', freq:'每周', point:2, sunOnly:false},
+    {cat:'home', sub:'英语', name:'试卷1篇', freq:'每周', point:2, sunOnly:false},
+    {cat:'school', sub:'语文', name:'语文作业', freq:'每日布置', point:1, sunOnly:false},
+    {cat:'school', sub:'数学', name:'数学作业', freq:'每日布置', point:1, sunOnly:false},
+    {cat:'school', sub:'英语', name:'英语作业', freq:'每日布置', point:1, sunOnly:false},
+    {cat:'daily', sub:'英语', name:'天才鸭', freq:'每天', point:1, sunOnly:false},
+    {cat:'daily', sub:'数学', name:'应用题1面', freq:'每天', point:1, sunOnly:false},
+    {cat:'daily', sub:'英语', name:'人人通', freq:'每天', point:1, sunOnly:false},
+    {cat:'daily', sub:'英语', name:'RAZ', freq:'每天', point:1, sunOnly:false},
+    {cat:'daily', sub:'语文', name:'猫老师晨读', freq:'每天', point:1, sunOnly:false}
+  ];
+  var catName = {home:'家庭作业', school:'学校作业', daily:'每日打卡'};
+  var catClass = {home:'cat-home-bg', school:'cat-school-bg', daily:'cat-daily-bg'};
+  var subClass = {'英语':'sub-en','数学':'sub-math','语文':'sub-cn'};
+  var catSpan = {home:7, school:3, daily:5};
+  var catIdx = {home:0, school:0, daily:0};
+  var dowArr = [];
+  var todayColGlobal = -1;
+
+  var now = new Date();
+  var curY = now.getFullYear(), curM = now.getMonth() + 1;
+
+  function spawnParticles(x, y, colors, count){
+    for(var i=0; i<count; i++){
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      var dx = (Math.random() * 180 - 90);
+      var dy = (Math.random() * 130 - 65);
+      p.style.setProperty('--dx', dx + 'px');
+      p.style.setProperty('--dy', dy + 'px');
+      document.body.appendChild(p);
+      (function(el){ setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 1000); })(p);
+    }
+  }
+  function spawnSpark(x, y){
+    var s = document.createElement('div');
+    s.className = 'spark';
+    s.style.left = (x - 30) + 'px';
+    s.style.top = (y - 30) + 'px';
+    document.body.appendChild(s);
+    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 750);
+  }
+
+  var leftBox = document.getElementById('leftRows');
+  tasks.forEach(function(t, idx){
+    var row = document.createElement('div');
+    row.className = 'row';
+    if(idx > 0 && t.cat !== tasks[idx-1].cat) row.classList.add('cat-start');
+    var catHtml = '';
+    if(catIdx[t.cat] === 0){
+      catHtml = '<span class="cat-badge '+catClass[t.cat]+'">'+catName[t.cat]+'</span>';
+    }
+    catIdx[t.cat]++;
+    if(catIdx[t.cat] >= catSpan[t.cat]) catIdx[t.cat] = 0;
+    row.innerHTML =
+      '<div class="l-cell l-cat">'+catHtml+'</div>' +
+      '<div class="l-cell l-sub '+subClass[t.sub]+'">'+t.sub+'</div>' +
+      '<div class="l-cell l-name"><b>'+t.name+'</b></div>' +
+      '<div class="l-cell l-freq">'+t.freq+'</div>' +
+      '<div class="l-cell l-point">'+t.point+'<br><span style="font-size:8px;color:#999;font-weight:400;">+🍅专注</span></div>';
+    leftBox.appendChild(row);
+  });
+
+  var rightHead = document.getElementById('rightHead');
+  for(var i=1; i<=30; i++){
+    var th = document.createElement('div');
+    th.className = 'r-cell head-day';
+    th.id = 'dh'+i;
+    th.innerHTML = '<span class="d-num">'+i+'</span><span class="d-wk">(?)</span>';
+    rightHead.appendChild(th);
+  }
+  var thTotal = document.createElement('div');
+  thTotal.className = 'r-cell head-day total-col';
+  thTotal.innerHTML = '<span class="d-num">本月</span><span class="d-wk">积分/🍅</span>';
+  rightHead.appendChild(thTotal);
+
+  var rightBox = document.getElementById('rightRows');
+  tasks.forEach(function(t, idx){
+    var row = document.createElement('div');
+    row.className = 'row';
+    if(idx > 0 && t.cat !== tasks[idx-1].cat) row.classList.add('cat-start');
+    row.setAttribute('data-row', idx);
+    for(var d=0; d<30; d++){
+      var cell = document.createElement('div');
+      cell.className = 'r-cell check-cell';
+      cell.setAttribute('data-r', idx);
+      cell.setAttribute('data-d', d);
+      cell.setAttribute('data-s', '0');
+      row.appendChild(cell);
+    }
+    var total = document.createElement('div');
+    total.className = 'r-cell total-cell';
+    total.innerHTML = '<span class="sc">0</span><span class="tm">🍅0</span>';
+    row.appendChild(total);
+    rightBox.appendChild(row);
+  });
+
+  var allCells = document.querySelectorAll('.check-cell');
+
+  function bindColHl(cell){
+    cell.addEventListener('mouseenter', function(){
+      var d = parseInt(cell.getAttribute('data-d'));
+      document.querySelectorAll('.check-cell[data-d="'+d+'"]').forEach(function(c){ c.classList.add('col-hl'); });
+      var th = document.getElementById('dh'+(d+1));
+      if(th) th.classList.add('col-hl-th');
+    });
+    cell.addEventListener('mouseleave', function(){
+      var d = parseInt(cell.getAttribute('data-d'));
+      document.querySelectorAll('.check-cell[data-d="'+d+'"]').forEach(function(c){ c.classList.remove('col-hl'); });
+      var th = document.getElementById('dh'+(d+1));
+      if(th) th.classList.remove('col-hl-th');
+    });
+  }
+  allCells.forEach(bindColHl);
+
+  function renderCell(cell){
+    var s = parseInt(cell.getAttribute('data-s'));
+    cell.className = 'r-cell check-cell';
+    cell.innerHTML = '';
+    if(parseInt(cell.getAttribute('data-d')) === todayColGlobal) cell.classList.add('today');
+    if(cell.getAttribute('data-off') === '1'){
+      cell.classList.add('off');
+      return;
+    }
+    if(s === 0) return;
+    cell.classList.add('s'+s);
+    if(s >= 1){
+      var ck = document.createElement('span');
+      ck.className = 'ck';
+      ck.textContent = '✓';
+      cell.appendChild(ck);
+    }
+    if(s >= 2){
+      var tm = document.createElement('span');
+      tm.className = 'tm';
+      tm.textContent = '🍅'+(s-1);
+      cell.appendChild(tm);
+    }
+  }
+
+  function calcCal(){
+    var y = parseInt(document.getElementById('yearInput').value) || 2026;
+    var m = parseInt(document.getElementById('monthInput').value) || 9;
+    var dim = new Date(y, m, 0).getDate();
+    var todayCol = (y === curY && m === curM && now.getDate() <= dim) ? (now.getDate() - 1) : -1;
+    todayColGlobal = todayCol;
+    dowArr = [];
+    for(var d=1; d<=30; d++){
+      if(d <= dim) dowArr.push(new Date(y, m-1, d).getDay());
+      else dowArr.push(-1);
+    }
+    for(var i=1; i<=30; i++){
+      var th = document.getElementById('dh'+i);
+      if(!th) continue;
+      var w = dowArr[i-1];
+      var numEl = th.querySelector('.d-num');
+      var wkEl = th.querySelector('.d-wk');
+      if(w === -1){
+        numEl.textContent = i;
+        wkEl.textContent = '';
+        th.style.background = '#eee';
+        th.style.color = '#ccc';
+      } else {
+        numEl.textContent = i;
+        wkEl.textContent = '('+WK[w]+')';
+        if(w === 0){
+          th.classList.add('sun');
+        } else {
+          th.classList.remove('sun');
+        }
+        th.style.background = w === 0 ? '#fdecea' : '#eef4fb';
+        th.style.color = '#4a5a6c';
+      }
+    }
+    allCells.forEach(function(cell){
+      var r = parseInt(cell.getAttribute('data-r'));
+      var d = parseInt(cell.getAttribute('data-d'));
+      var w = dowArr[d];
+      var off = false;
+      if(w === -1) off = true;
+      if(tasks[r].sunOnly && w !== 0) off = true;
+      if(off){
+        cell.setAttribute('data-off', '1');
+        if(parseInt(cell.getAttribute('data-s')) > 0) cell.setAttribute('data-s', '0');
+      } else {
+        cell.setAttribute('data-off', '0');
+      }
+      renderCell(cell);
+    });
+    var thT = document.getElementById('dh'+(todayCol+1));
+    if(thT){
+      thT.classList.add('today-th');
+      if(!thT.querySelector('.today-tag')){
+        var tg = document.createElement('span');
+        tg.className = 'today-tag';
+        tg.textContent = '今';
+        thT.appendChild(tg);
+      }
+    }
+  }
+
+  function curMonthKey(){
+    var y = parseInt(document.getElementById('yearInput').value) || 2026;
+    var m = parseInt(document.getElementById('monthInput').value) || 9;
+    return y + '-' + m;
+  }
+
+  function loadCellsFor(mk){
+    try{
+      var data = JSON.parse(localStorage.getItem(KEY));
+      var cells = (data && data.cells && data.cells[mk]) || {};
+      allCells.forEach(function(cell){
+        var r = parseInt(cell.getAttribute('data-r'));
+        var d = parseInt(cell.getAttribute('data-d'));
+        if(cells[r] && cells[r][d] !== undefined) cell.setAttribute('data-s', cells[r][d]);
+        else cell.setAttribute('data-s', '0');
+      });
+    }catch(e){}
+    allCells.forEach(function(c){ renderCell(c); });
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      var shownM = parseInt(document.getElementById('monthInput').value) || 9;
+      if(raw){
+        var data = JSON.parse(raw);
+        if(data.y) document.getElementById('yearInput').value = data.y;
+        if(data.m) document.getElementById('monthInput').value = data.m;
+        if(data.name) document.getElementById('nameInput').value = data.name;
+        if(data.goal) document.getElementById('goalInput').value = data.goal;
+        window.__rewards = data.rewards || {};
+        window.__money = data.money || {};
+        window.__monthly = data.monthly || {};
+        if(!data.monthly && data.tomatoTotal){
+          var oldKey = (data.y || 2026) + '-' + (data.m || shownM);
+          if(!(oldKey in window.__monthly)) window.__monthly[oldKey] = data.tomatoTotal;
+        }
+        if(data.cells){
+          var hasMonthKey = Object.keys(data.cells).some(function(k){ return /^\d{4}-\d{1,2}$/.test(k); });
+          if(!hasMonthKey){
+            var oldMk = (data.y || 2026) + '-' + (data.m || shownM);
+            var tmp = {}; tmp[oldMk] = data.cells;
+            data.cells = tmp;
+          }
+        }
+        window.__lastLevel = data.lastLevel || 1;
+        calcCal();
+        loadCellsFor(curMonthKey());
+      } else {
+        window.__rewards = {};
+        window.__money = {};
+        window.__monthly = {};
+        window.__lastLevel = 1;
+        calcCal();
+      }
+    }catch(e){ console.error(e); calcCal(); window.__rewards = {}; window.__money = {}; window.__monthly = {}; window.__lastLevel = 1; }
+    allCells.forEach(function(c){ renderCell(c); });
+  }
+
+  function save(){
+    try{
+      var old = null;
+      try{ old = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
+      var data = old || {};
+      data.y = parseInt(document.getElementById('yearInput').value);
+      data.m = parseInt(document.getElementById('monthInput').value);
+      data.name = document.getElementById('nameInput').value;
+      data.goal = document.getElementById('goalInput').value;
+      data.rewards = window.__rewards || {};
+      data.money = window.__money || {};
+      data.monthly = window.__monthly || {};
+      data.lastLevel = window.__lastLevel || 1;
+      data.cells = data.cells || {};
+      var mk = curMonthKey();
+      data.cells[mk] = {};
+      allCells.forEach(function(cell){
+        var r = parseInt(cell.getAttribute('data-r'));
+        var d = parseInt(cell.getAttribute('data-d'));
+        if(!data.cells[mk][r]) data.cells[mk][r] = {};
+        var s = parseInt(cell.getAttribute('data-s'));
+        if(s > 0) data.cells[mk][r][d] = s;
+      });
+      localStorage.setItem(KEY, JSON.stringify(data));
+    }catch(e){ console.error(e); }
+  }
+
+  allCells.forEach(function(cell){
+    cell.addEventListener('click', function(e){
+      e.preventDefault();
+      if(cell.getAttribute('data-off') === '1') return;
+      var r = parseInt(cell.getAttribute('data-r'));
+      var d = parseInt(cell.getAttribute('data-d'));
+      var s = parseInt(cell.getAttribute('data-s'));
+      var ns = (s + 1) % 5;
+      cell.setAttribute('data-s', ns);
+      renderCell(cell);
+      cell.classList.add('pop');
+      setTimeout(function(){ cell.classList.remove('pop'); }, 340);
+
+      var rect = cell.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+
+      if(ns === 1){
+        spawnParticles(cx, cy, ['#6fdc8c', '#a5e8b8', '#2ecc71', '#d9f7e0'], 8);
+        var fs = document.createElement('span');
+        fs.className = 'float-score';
+        fs.textContent = '+' + tasks[r].point;
+        cell.appendChild(fs);
+        setTimeout(function(){ if(fs.parentNode) fs.parentNode.removeChild(fs); }, 1000);
+      } else if(ns > 1){
+        spawnParticles(cx, cy, ['#ffd36e', '#ff8c1a', '#fff3c4', '#ff6b35'], 12);
+        spawnSpark(cx, cy);
+        var ft = document.createElement('span');
+        ft.className = 'float-tomato';
+        ft.textContent = '🍅+1';
+        cell.appendChild(ft);
+        setTimeout(function(){ if(ft.parentNode) ft.parentNode.removeChild(ft); }, 1050);
+      } else if(ns === 0 && s === 4){
+        var ft2 = document.createElement('span');
+        ft2.className = 'float-tomato';
+        ft2.style.color = '#e74c3c';
+        ft2.textContent = '🍅-3';
+        cell.appendChild(ft2);
+        setTimeout(function(){ if(ft2.parentNode) ft2.parentNode.removeChild(ft2); }, 1050);
+      }
+      showCellTip(cell, r, d);
+      calcAndRender();
+      save();
+    });
+  });
+
+  function showCellTip(cell, r, d){
+    var y = parseInt(document.getElementById('yearInput').value) || 2026;
+    var m = parseInt(document.getElementById('monthInput').value) || 9;
+    var dim = new Date(y, m, 0).getDate();
+    if(d + 1 > dim) return;
+    var wd = WK[new Date(y, m-1, d+1).getDay()];
+    var tip = document.createElement('div');
+    tip.className = 'cell-tip';
+    tip.textContent = m + '月' + (d+1) + '日(' + wd + ') · ' + tasks[r].name;
+    var rect = cell.getBoundingClientRect();
+    var x = rect.left + rect.width / 2;
+    var yp = rect.top - 36;
+    if(yp < 10) yp = rect.bottom + 8;
+    tip.style.left = x + 'px';
+    tip.style.top = yp + 'px';
+    document.body.appendChild(tip);
+    setTimeout(function(){ if(tip.parentNode) tip.parentNode.removeChild(tip); }, 1600);
+  }
+
+  function switchMonth(){
+    loadCellsFor(curMonthKey());
+    calcCal();
+    calcAndRender();
+    save();
+  }
+  document.getElementById('yearInput').addEventListener('change', switchMonth);
+  document.getElementById('monthInput').addEventListener('change', switchMonth);
+  document.getElementById('nameInput').addEventListener('change', save);
+  document.getElementById('goalInput').addEventListener('change', save);
+
+  function countSundays(y, m){
+    var n = 0, dim = new Date(y, m, 0).getDate();
+    for(var i=1; i<=dim; i++) if(new Date(y, m-1, i).getDay() === 0) n++;
+    return n;
+  }
+
+  function calcAndRender(){
+    var y = parseInt(document.getElementById('yearInput').value) || 2026;
+    var m = parseInt(document.getElementById('monthInput').value) || 9;
+    var dim = new Date(y, m, 0).getDate();
+
+    var tBase = 0, tReward = 0, tTomato = 0, tAvail = 0, tDone = 0;
+    var fullArr = {};
+    var weeklyCnt = {};
+
+    for(var i=0; i<tasks.length; i++){
+      var rScore = 0, rTomato = 0, rDone = 0;
+      for(var d=0; d<30; d++){
+        var cell = document.querySelector('.check-cell[data-r="'+i+'"][data-d="'+d+'"]');
+        if(!cell || cell.getAttribute('data-off') === '1') continue;
+        tAvail++;
+        var s = parseInt(cell.getAttribute('data-s'));
+        if(s > 0){
+          tDone++;
+          rDone++;
+          tBase += tasks[i].point;
+          if(s > 1) tTomato += (s - 1);
+          rScore += tasks[i].point;
+          rTomato += (s - 1);
+        }
+      }
+      if(tasks[i].freq.indexOf('每周') >= 0 || tasks[i].sunOnly){
+        weeklyCnt[i] = rDone;
+      }
+      var row = document.querySelector('.row[data-row="'+i+'"]');
+      if(row){
+        var tc = row.querySelector('.total-cell');
+        if(tc){
+          tc.querySelector('.sc').textContent = rScore;
+          tc.querySelector('.tm').textContent = '🍅'+rTomato;
+        }
+      }
+    }
+
+    var fullDays = 0;
+    for(var d=0; d<30; d++){
+      if(dowArr[d] === -1) continue;
+      var ok = true;
+      for(var i=0; i<tasks.length; i++){
+        if(tasks[i].freq !== '每天' && tasks[i].freq !== '每天1次') continue;
+        var c = document.querySelector('.check-cell[data-r="'+i+'"][data-d="'+d+'"]');
+        if(c && c.getAttribute('data-off') !== '1' && parseInt(c.getAttribute('data-s')) === 0){ ok = false; break; }
+      }
+      if(ok){ fullDays++; fullArr[d] = true; }
+    }
+
+    var todayDay = Math.min(now.getDate(), dim);
+    if(!(y === curY && m === curM)) todayDay = dim;
+    var streak = 0;
+    var start = todayDay;
+    if(!fullArr[start]) start = todayDay - 1;
+    for(var dd = start; dd >= 1; dd--){
+      if(fullArr[dd]) streak++; else break;
+    }
+
+    var firstDay = false;
+    for(var i=0; i<tasks.length; i++){
+      var c1 = document.querySelector('.check-cell[data-r="'+i+'"][data-d="0"]');
+      if(c1 && c1.getAttribute('data-off') !== '1' && parseInt(c1.getAttribute('data-s')) > 0){ firstDay = true; break; }
+    }
+
+    var fullMonth = (fullDays >= dim);
+
+    var sunCount = countSundays(y, m);
+    var weeklyDone = 0, wkTotal = 0;
+    for(var k in weeklyCnt){ wkTotal++; if(weeklyCnt[k] >= sunCount) weeklyDone++; }
+    var weeklyAll = wkTotal > 0 && weeklyDone === wkTotal;
+
+    var rw = window.__rewards || (window.__rewards = {});
+    var msgs = [];
+    if(firstDay && !rw.firstDay){ rw.firstDay = true; tReward += 3; msgs.push('🌟 开门红徽章 +3分'); }
+    if(streak >= 7 && !rw.streak7){ rw.streak7 = true; tReward += 5; msgs.push('🔥 连续全勤7天 +5分'); }
+    if(streak >= 14 && !rw.streak14){ rw.streak14 = true; tReward += 10; msgs.push('⚡ 连续全勤14天 +10分'); }
+    if(streak >= 21 && !rw.streak21){ rw.streak21 = true; tReward += 15; msgs.push('💎 连续全勤21天 +15分'); }
+    if(fullMonth && !rw.fullMonth){ rw.fullMonth = true; tReward += 20; msgs.push('🏆 满月英雄 +20分'); }
+    if(tTomato >= 20 && !rw.tomato20){ rw.tomato20 = true; tReward += 10; msgs.push('🍅 番茄猎手 +10分'); }
+    if(weeklyAll && !rw.weeklyAll){ rw.weeklyAll = true; tReward += 15; msgs.push('🏅 全能王者 +15分'); }
+
+    var totalScore = tBase + tReward;
+
+    if(!window.__monthly) window.__monthly = {};
+    window.__monthly[y + '-' + m] = tTomato;
+    var tomatoTotal = 0;
+    for(var mk in window.__monthly) tomatoTotal += window.__monthly[mk];
+
+    var lv = LEVELS[0], nextLv = LEVELS[1];
+    for(var li = LEVELS.length - 1; li >= 0; li--){
+      if(tomatoTotal >= LEVELS[li].need){ lv = LEVELS[li]; nextLv = LEVELS[li+1] || null; break; }
+    }
+    var lvIndex = LEVELS.indexOf(lv) + 1;
+    var span = nextLv ? (nextLv.need - lv.need) : 50;
+    var prog = nextLv ? Math.min(100, Math.round((tomatoTotal - lv.need) / span * 100)) : 100;
+
+    if(lvIndex > (window.__lastLevel || 1)){
+      window.__lastLevel = lvIndex;
+      showLevelUp(lv, nextLv);
+    } else {
+      window.__lastLevel = lvIndex;
+    }
+
+    document.getElementById('lvNum').textContent = 'Lv.' + lvIndex;
+    document.getElementById('lvName').textContent = lv.name;
+    document.getElementById('lvTitle').innerHTML = lv.name + ' <span class="star">· 进化中</span>';
+    document.getElementById('xpBar').style.width = prog + '%';
+    document.getElementById('xpText').textContent = nextLv
+      ? ('再攒 ' + (nextLv.need - tomatoTotal) + ' 个🍅 进化为「' + nextLv.name + '」')
+      : '已是最强战士，全场为你喝彩！';
+    document.getElementById('streakNum').textContent = streak;
+    document.getElementById('tomatoNum').textContent = tTomato;
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('scoreBreak').textContent = '基础' + tBase + '+奖励' + tReward;
+    document.getElementById('totalTomato').textContent = tTomato;
+    document.getElementById('totalRate').textContent = tAvail > 0 ? Math.round(tDone/tAvail*100) + '%' : '0%';
+    document.getElementById('fullDays').textContent = fullDays;
+
+    var badges = [
+      {got: firstDay,      ic:'🌟', nm:'开门红',   ds:'本月第一天就打卡'},
+      {got: streak >= 7,   ic:'🔥', nm:'七日之约', ds:'连续全勤7天'},
+      {got: streak >= 14,  ic:'⚡', nm:'半月坚持', ds:'连续全勤14天'},
+      {got: fullMonth,     ic:'💎', nm:'满月英雄', ds:'本月全部全勤'},
+      {got: tTomato >= 20, ic:'🍅', nm:'番茄猎手', ds:'本月20个番茄'},
+      {got: weeklyAll,     ic:'🏆', nm:'全能王者', ds:'每周任务全完成'}
+    ];
+    var bbox = document.getElementById('badgesBox');
+    bbox.innerHTML = '';
+    badges.forEach(function(b){
+      var el = document.createElement('div');
+      el.className = 'badge' + (b.got ? ' got' : ' locked');
+      el.innerHTML = '<span class="ic">' + b.ic + '</span><span class="nm">' + b.nm + '</span><span class="ds">' + b.ds + '</span>';
+      bbox.appendChild(el);
+    });
+
+    msgs.forEach(function(msg){ showToast(msg); });
+  }
+
+  function showToast(msg){
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){
+      t.style.transition = 'opacity 0.4s';
+      t.style.opacity = '0';
+      setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 400);
+    }, 2600);
+  }
+
+  function showLevelUp(lv, nextLv){
+    var cx = window.innerWidth / 2;
+    var cy = window.innerHeight / 3;
+    spawnParticles(cx, cy, ['#ffd36e', '#ff8c1a', '#fff3c4', '#ff6b35', '#ffe29a', '#ffffff'], 46);
+    setTimeout(function(){ spawnParticles(cx, cy - 40, ['#ffd36e', '#fff3c4', '#ff8c1a'], 30); }, 180);
+    setTimeout(function(){ spawnSpark(cx, cy); }, 120);
+
+    var ov = document.createElement('div');
+    ov.className = 'levelup-overlay';
+    ov.innerHTML =
+      '<div class="levelup-box">' +
+      '<div class="big">⚡</div>' +
+      '<div class="t1">进化成功！' + lv.name + '</div>' +
+      '<div class="t2">' + (nextLv ? '下一阶：「' + nextLv.name + '」 需要 ' + nextLv.need + ' 个🍅' : '你已经登顶啦！') + '</div>' +
+      '<button class="btn">太帅了！</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(){ document.body.removeChild(ov); });
+  }
+
+  function randomMotto(){
+    var idx = Math.floor(Math.random() * MOTTOS.length);
+    document.getElementById('motto').textContent = MOTTOS[idx];
+  }
+
+  function renderMoney(){
+    var box = document.getElementById('moneyRows');
+    box.innerHTML = '';
+    var total = 0;
+    MONEY_RULES.forEach(function(rule, idx){
+      var cnt = (window.__money && window.__money[idx]) || 0;
+      var sub = rule.price * cnt;
+      total += sub;
+      var row = document.createElement('div');
+      row.className = 'money-row';
+      row.setAttribute('data-m', idx);
+      var subTxt = sub === 0 ? '0' : (sub > 0 ? '+' + sub : '' + sub);
+      row.innerHTML =
+        '<div class="mn">' + rule.name + '</div>' +
+        '<div class="up">' + rule.unit + '</div>' +
+        '<button class="btn-m minus" data-act="minus">−</button>' +
+        '<div class="cnt">' + cnt + '</div>' +
+        '<button class="btn-m plus" data-act="plus">+</button>' +
+        '<div class="sub' + (sub < 0 ? ' neg' : '') + '">' + subTxt + '</div>';
+      box.appendChild(row);
+    });
+    document.getElementById('moneyTotal').textContent = total;
+  }
+
+  document.getElementById('moneyRows').addEventListener('click', function(e){
+    var btn = e.target.closest ? e.target.closest('.btn-m') : null;
+    if(!btn) return;
+    var row = btn.parentNode;
+    var idx = parseInt(row.getAttribute('data-m'), 10);
+    if(!window.__money) window.__money = {};
+    var cnt = window.__money[idx] || 0;
+    if(btn.getAttribute('data-act') === 'plus') cnt++;
+    else cnt = Math.max(0, cnt - 1);
+    window.__money[idx] = cnt;
+    renderMoney();
+    save();
+  });
+
+  window.resetAll = function(){
+    if(confirm('确定清空本月所有打卡记录吗？（进化等级和奖励记录会保留）')){
+      allCells.forEach(function(cell){
+        if(cell.getAttribute('data-off') !== '1'){
+          cell.setAttribute('data-s', '0');
+          renderCell(cell);
+        }
+      });
+      calcAndRender();
+      save();
+    }
+  };
+
+  /* ===== 备份 / 恢复（数据永远掌握在自己手里） ===== */
+  document.getElementById('btnBackup').addEventListener('click', function(){
+    save();
+    var raw = localStorage.getItem(KEY);
+    if(!raw){ showToast('还没有数据可备份'); return; }
+    /* 用隐藏 textarea 兼容 iOS Safari 复制 */
+    var ta = document.createElement('textarea');
+    ta.value = raw;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    if(ok){
+      showToast('✅ 备份已复制！请粘贴到微信/备忘录保存');
+    } else {
+      /* 兜底：弹窗显示数据，长按复制 */
+      var txt = prompt('自动复制失败，请长按下面的内容全选并复制：', raw);
+      if(txt === null){ /* 用户取消 */ }
+    }
+  });
+
+  document.getElementById('btnRestore').addEventListener('click', function(){
+    var txt = prompt('请粘贴之前备份的完整数据（很长的一串，全部粘贴进来）：');
+    if(!txt) return;
+    txt = txt.trim();
+    if(!txt){ showToast('没有输入内容'); return; }
+    try{
+      var obj = JSON.parse(txt);
+      if(!obj || typeof obj !== 'object'){ throw new Error('bad'); }
+      localStorage.setItem(KEY, JSON.stringify(obj));
+      showToast('✅ 数据已恢复，正在刷新…');
+      setTimeout(function(){ location.reload(); }, 600);
+    }catch(e){
+      showToast('❌ 数据格式不对，请重新完整复制备份内容');
+    }
+  });
+
+  load();
+  randomMotto();
+  calcAndRender();
+  renderMoney();
+})();
+</script>
+</body>
+</html>
